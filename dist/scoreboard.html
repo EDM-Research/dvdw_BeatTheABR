@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard - Beat The ABR</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./bootstrap/bootstrap.min.css">
+    <style>
+        .gold {
+            background-color: gold;
+        }
+
+        .silver {
+            background-color: silver;
+        }
+
+        .bronze {
+            background-color: #CD7F32;
+        }
+    </style>
+
+    <script>
+        function setScores(data, elId) {
+            data.sort((a, b) => { return b['score'] - a['score'] });
+
+            let element = document.getElementById(elId);
+            while (element.firstChild) {
+                element.removeChild(element.lastChild);
+            }
+
+            let newCard = null;
+            let lastScore = null;
+            let count = 0;
+
+            for (let i = 0; count < 10 && i < data.length; i++) {
+                const e = data[i];
+
+                if (lastScore && lastScore !== e['score']) {
+                    element.appendChild(newCard);
+                    count += 1;
+                    newCard = null;
+                    if (count >= 10) {
+                        break;
+                    }
+                } else if (lastScore) {
+                    let names = newCard.getElementsByClassName('card-title')[0];
+                    names.innerText += ' & ' + e['name'];
+                }
+
+                if (!newCard) {
+                    newCard = document.createElement('div');
+                    newCard.classList.add('card');
+                    newCard.classList.add('p-2');
+
+                    if (i === 0) {
+                        newCard.classList.add('gold');
+                    } else if (i === 1) {
+                        newCard.classList.add('silver');
+                    } else if (i === 2) {
+                        newCard.classList.add('bronze');
+                    }
+
+                    let names = document.createElement('h2');
+                    names.id = 'names';
+                    names.classList.add('card-title');
+                    names.classList.add('text-center');
+                    names.innerText = e['name'];
+                    newCard.appendChild(names);
+
+                    let score = document.createElement('h4');
+                    score.classList.add('card-subtitle');
+                    score.classList.add('text-center');
+                    score.innerText = e['score'];
+                    lastScore = e['score'];
+                    newCard.appendChild(score);
+                }
+            }
+
+            if (newCard) {
+                element.appendChild(newCard);
+            }
+        }
+
+        const interval = setInterval(async function () {
+            const response = await fetch('./scoreboard/get');
+            const data = await response.json();
+            setScores(data['flappy'], 'flappy-scores');
+            setScores(data['karaoke'], 'karaoke-scores');
+        }, 5000);
+    </script>
+</head>
+
+<body>
+    <header class="py-3 mb-3 border-bottom">
+        <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr 1fr;">
+            <div id="logo">
+                <img style="height: 40px;" src="./assets/EDM-logo.jpg">
+            </div>
+            <div class="text-center">
+                <h1>Scoreboard</h1>
+            </div>
+            <div style="padding-left: 20em;">
+                <!-- spacing -->
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col" id="flappy">
+                <h2>Flappy ABR</h2>
+                <div id="flappy-scores"></div>
+            </div>
+            <div class="col" id="karaoke">
+                <h2>Bit Rate Optimizer</h2>
+                <div id="karaoke-scores"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

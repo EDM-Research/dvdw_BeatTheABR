@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beat The ABR</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./bootstrap/bootstrap.min.css">
+    <style>
+        #video video {
+            width: 888px;
+        }
+        .controls-button {
+            width: 210px;
+            height: 130px;
+        }
+        .controls-message {
+            width: 210px;
+            height: 130px;
+            background-color: lightgray;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="py-3 mb-3 border-bottom">
+        <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr 1fr;">
+            <div id="logo">
+                <img style="height: 40px;" src="./assets/EDM-logo.jpg">
+            </div>
+            <div id="search">
+                <input class="form-control" type="search" placeholder="Search..." aria-label="search">
+            </div>
+            <div style="padding-left: 20em;">
+                <a href="./scoreboard.html"><button>Scoreboard</button></a>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8" id="game">
+                <div id="video"></div>
+                <div id="abr"></div>
+                <div id="title">
+                    <h2>Beat The ABR</h2>
+                </div>
+            </div>
+            <div id="controls" style="overflow: hidden; padding-left: 4em;" class="col-md-4">
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>
