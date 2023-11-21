@@ -485,7 +485,10 @@ class KaraokeScene extends Scene {
     timer: number;
 
     started: boolean;
+    firstStart: boolean;
     ended: boolean;
+
+    diffMod: number;
 
     static readonly GameTime = 60 * 1000;
 
@@ -509,7 +512,10 @@ class KaraokeScene extends Scene {
         this.timer = FlappyScene.GameTime;
 
         this.started = false;
+        this.firstStart = true;
         this.ended = false;
+
+        this.diffMod = 1;
     }
 
     public reset() {
@@ -517,9 +523,12 @@ class KaraokeScene extends Scene {
         this.timer = FlappyScene.GameTime;
 
         this.started = false;
+        this.firstStart = true;
         this.ended = false;
 
         this.errors.forEach((e) => { e.destroy() });
+
+        this.diffMod = 1;
     }
 
     public init() {
@@ -610,6 +619,26 @@ class KaraokeScene extends Scene {
         this.pointerPlay?.setPosition(KaraokeScene.PointerX, currentY);
 
         if (this.started) {
+            if (this.firstStart) {
+                this.firstStart = false;
+
+                switch (this.ge.controls.difficultySelect.selectedOptions[0].value) {
+                    case 'Easy':
+                        this.diffMod = 1;
+                        break;
+                    case 'Medium':
+                        this.diffMod = 2;
+                        break;
+                    case 'Hard':
+                        this.diffMod = 3;
+                        break;
+
+                    default:
+                        this.diffMod = 1;
+                        break;
+                }
+            }
+
             this.timer -= delta;
             if (this.timer <= 0) {
                 this.timer = 0;
@@ -620,6 +649,8 @@ class KaraokeScene extends Scene {
                 //setup end
                 this.ge.controls.enableScoreSubmit();
             }
+
+            this.ge.controls.score += delta * this.diffMod / 1000;
 
             let newest = this.errors[this.errors.length - 1];
             if (!newest || newest.body.position.x + newest.body.width < Width + KaraokeScene.ErrorBuffer) {
@@ -641,7 +672,7 @@ class KaraokeScene extends Scene {
                 cp.setScale(KaraokeScene.ErrorSpacer, height);
                 cp.setOrigin(0, 0);
                 cp.body.updateFromGameObject();
-                cp.setVelocityX(-100);
+                cp.setVelocityX(-100 * this.diffMod);
                 this.errors.push(cp);
             }
 
