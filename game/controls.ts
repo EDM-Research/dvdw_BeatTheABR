@@ -4,6 +4,7 @@ export class ControlsElement {
     scoreElement: HTMLElement;
     scoreValue: number;
     stateSelect: HTMLSelectElement;
+    difficultySelect: HTMLSelectElement;
     resetBtn: HTMLButtonElement;
     nameInput: HTMLInputElement;
     scoreSubmit: HTMLButtonElement;
@@ -52,6 +53,11 @@ export class ControlsElement {
         this.stateSelect.classList.add('text-center');
         parent.appendChild(this.stateSelect);
 
+        this.difficultySelect = document.createElement('select');
+        this.styleButton(this.difficultySelect);
+        this.difficultySelect.classList.add('text-center');
+        parent.appendChild(this.difficultySelect);
+
         this.resetBtn = document.createElement('button');
         this.styleButton(this.resetBtn);
         this.resetBtn.innerText = 'Reset';
@@ -88,6 +94,15 @@ export class ControlsElement {
                 this.stateSelect.appendChild(option);
             }
         }
+    }
+
+    public setDifficulties(difficulties: string[]) {
+        difficulties.forEach(d => {
+            let option = document.createElement('option');
+            option.value = d;
+            option.innerText = d;
+            this.difficultySelect.appendChild(option);
+        });
     }
 
     private styleButton(element: HTMLElement) {

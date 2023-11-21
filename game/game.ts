@@ -34,6 +34,8 @@ export class GameElement {
             this.reset();
         };
 
+        this.controls.setDifficulties(['Easy', 'Medium', 'Hard']);
+
         this.engine = new ph.Game({
             width: Width,
             height: Height,
@@ -214,6 +216,8 @@ class FlappyScene extends Scene {
     bufferTime: number;
     lqTime: number;
 
+    diffMod: number;
+
     static readonly CeilingGroundHeight = Height / 20;
 
     static readonly GameTime = 60 * 1000;
@@ -245,6 +249,8 @@ class FlappyScene extends Scene {
         this.lastJump = 0;
         this.bufferTime = 0;
         this.lqTime = 0
+
+        this.diffMod = 1;
     }
 
     public init() {
@@ -329,12 +335,28 @@ class FlappyScene extends Scene {
                 this.firstStart = true;
                 this.ge.video.change(0);
                 this.ge.video.play();
+
+                switch (this.ge.controls.difficultySelect.selectedOptions[0].value) {
+                    case 'Easy':
+                        this.diffMod = 1;
+                        break;
+                    case 'Medium':
+                        this.diffMod = 2;
+                        break;
+                    case 'Hard':
+                        this.diffMod = 3;
+                        break;
+
+                    default:
+                        this.diffMod = 1;
+                        break;
+                }
             }
             this.bird?.setVelocityY(Math.min(<number>this.bird.body?.velocity.y + FlappyScene.Gravity * delta, FlappyScene.Jump));
 
             [this.ceilingPipes, this.groundPipes].forEach((pipes) => {
                 pipes.forEach(p => {
-                    p.setVelocityX(-100);
+                    p.setVelocityX(-100 * this.diffMod);
                 });
             });
 
@@ -367,7 +389,7 @@ class FlappyScene extends Scene {
                 this.ge.video.change(this.ge.video.max - 1);
             } else {
                 this.ge.video.change(0);
-                this.ge.controls.score += delta / 1000;
+                this.ge.controls.score += delta * this.diffMod / 1000;
             }
 
             // //@ts-ignore
