@@ -301,6 +301,8 @@ class FlappyScene extends Scene {
 
                     this.lastJump = Date.now();
                 }
+            } else if (![Phaser.Input.Keyboard.KeyCodes.F5].includes(event.keyCode)) {
+                event.preventDefault();
             }
         });
     }
@@ -574,6 +576,8 @@ class KaraokeScene extends Scene {
             } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.DOWN) {
                 event.preventDefault();
                 index = Math.min(this.ge.video.max - 1, this.current + 1);
+            } else if (![Phaser.Input.Keyboard.KeyCodes.F5].includes(event.keyCode)) {
+                event.preventDefault();
             }
 
             if (index !== this.current) {
