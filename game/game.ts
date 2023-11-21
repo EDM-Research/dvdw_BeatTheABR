@@ -301,7 +301,7 @@ class FlappyScene extends Scene {
 
                     this.lastJump = Date.now();
                 }
-            } else if (![Phaser.Input.Keyboard.KeyCodes.F5].includes(event.keyCode)) {
+            } else if (![Phaser.Input.Keyboard.KeyCodes.F5, Phaser.Input.Keyboard.KeyCodes.F11, Phaser.Input.Keyboard.KeyCodes.F12].includes(event.keyCode)) {
                 event.preventDefault();
             }
         });
@@ -476,7 +476,7 @@ class KaraokeScene extends Scene {
     timerText: ph.GameObjects.Text | undefined;
 
     lines: ph.Geom.Line[];
-    pointerPlay: ph.GameObjects.Sprite | undefined;
+    pointerPlay: ph.Physics.Arcade.Sprite | undefined;
 
     errors: ph.Types.Physics.Arcade.ImageWithDynamicBody[];
     chances: number[];
@@ -526,7 +526,8 @@ class KaraokeScene extends Scene {
         this.firstStart = true;
         this.ended = false;
 
-        this.errors.forEach((e) => { e.destroy() });
+        this.errors.forEach((e) => { e.destroy(); });
+        this.errors = [];
 
         this.diffMod = 1;
     }
@@ -563,29 +564,25 @@ class KaraokeScene extends Scene {
         }
         this.chances.push(1);
 
-        this.pointerPlay = this.add.sprite(100, 100, 'play');
+        this.pointerPlay = this.physics.add.sprite(100, 100, 'play');
 
         this.timerText = this.add.text(10, 20, 'Time Left: ', { fontSize: 30, color: Black.toString() });
 
         this.input.keyboard?.on('keydown', (event: KeyboardEvent) => {
             let index = this.current;
 
-            if (this.ended) {
-                return;
-            }
-
-            if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.SPACE) {
+            if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.SPACE && !this.ended) {
                 event.preventDefault();
                 this.started = true;
                 this.ge.video.change(this.current);
                 this.ge.video.play();
-            } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.UP) {
+            } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.UP && !this.ended) {
                 event.preventDefault();
                 index = Math.max(0, this.current - 1);
-            } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.DOWN) {
+            } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.DOWN && !this.ended) {
                 event.preventDefault();
                 index = Math.min(this.ge.video.max - 1, this.current + 1);
-            } else if (![Phaser.Input.Keyboard.KeyCodes.F5].includes(event.keyCode)) {
+            } else if (![Phaser.Input.Keyboard.KeyCodes.F5, Phaser.Input.Keyboard.KeyCodes.F11, Phaser.Input.Keyboard.KeyCodes.F12].includes(event.keyCode)) {
                 event.preventDefault();
             }
 
@@ -650,7 +647,11 @@ class KaraokeScene extends Scene {
                 this.ge.controls.enableScoreSubmit();
             }
 
-            this.ge.controls.score += delta * this.diffMod / 1000;
+            if (this.physics.world.overlap(this.pointerPlay, this.errors)) {
+                // this.current = Math.min(this.ge.video.max -1, this.current+1); //TODO
+            } else {
+                this.ge.controls.score += delta * this.diffMod * (this.ge.video.max - this.current) / 1000;
+            }
 
             let newest = this.errors[this.errors.length - 1];
             if (!newest || newest.body.position.x + newest.body.width < Width + KaraokeScene.ErrorBuffer) {
