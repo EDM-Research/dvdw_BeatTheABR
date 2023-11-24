@@ -301,7 +301,7 @@ class FlappyScene extends Scene {
 
                     this.lastJump = Date.now();
                 }
-            } else if (![Phaser.Input.Keyboard.KeyCodes.F5, Phaser.Input.Keyboard.KeyCodes.F11, Phaser.Input.Keyboard.KeyCodes.F12].includes(event.keyCode)) {
+            } else if ([Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.TAB].includes(event.keyCode)) {
                 event.preventDefault();
             }
         });
@@ -479,6 +479,7 @@ class KaraokeScene extends Scene {
     pointerPlay: ph.Physics.Arcade.Sprite | undefined;
 
     errors: ph.Types.Physics.Arcade.ImageWithDynamicBody[];
+    users: ph.Types.Physics.Arcade.SpriteWithDynamicBody[];
     chances: number[];
 
     current: number;
@@ -509,6 +510,7 @@ class KaraokeScene extends Scene {
         this.lines = [];
 
         this.errors = [];
+        this.users = [];
         this.chances = [];
 
         this.current = 0;
@@ -533,6 +535,9 @@ class KaraokeScene extends Scene {
 
         this.errors.forEach((e) => { e.destroy(); });
         this.errors = [];
+
+        this.users.forEach((e) => { e.destroy(); });
+        this.users = [];
 
         this.diffMod = 1;
     }
@@ -588,7 +593,7 @@ class KaraokeScene extends Scene {
             } else if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.DOWN && !this.ended) {
                 event.preventDefault();
                 index = Math.min(this.ge.video.max - 1, this.current + 1);
-            } else if (![Phaser.Input.Keyboard.KeyCodes.F5, Phaser.Input.Keyboard.KeyCodes.F11, Phaser.Input.Keyboard.KeyCodes.F12].includes(event.keyCode)) {
+            } else if ([Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.TAB].includes(event.keyCode)) {
                 event.preventDefault();
             }
 
@@ -665,6 +670,20 @@ class KaraokeScene extends Scene {
                 this.ge.controls.score += delta * this.diffMod * (this.ge.video.max - this.current) / 1000;
             }
 
+            if (this.physics.world.overlap(this.pointerPlay, this.users)) {
+                for (let i = 0; i < this.users.length; i++) {
+                    const u = this.users[i];
+                    if (this.physics.world.overlap(this.pointerPlay, u)) {
+                        u.setVisible(false);
+                        u.setY(Height * 2);
+                        this.ge.controls.score -= 50;
+                        break;
+                    } else {
+                        //
+                    }
+                }
+            }
+
             let newest = this.errors[this.errors.length - 1];
             if (!newest || newest.body.position.x + newest.body.width < Width + KaraokeScene.ErrorBuffer) {
                 //new error
@@ -693,7 +712,7 @@ class KaraokeScene extends Scene {
                     us.setOrigin(0, 0);
                     us.body.updateFromGameObject();
                     us.setVelocityX(-100 * this.diffMod);
-                    this.errors.push(us);
+                    this.users.push(us);
                 }
             }
 
@@ -703,8 +722,15 @@ class KaraokeScene extends Scene {
                 this.errors.shift();
             }
 
+            let oldestU = this.users[0];
+            if (oldestU && oldestU.body.position.x + oldestU.body.width < 0 - KaraokeScene.ErrorSpacer) {
+                this.users[0].destroy();
+                this.users.shift();
+            }
+
         } else {
             this.errors.forEach((e) => { e.setVelocityX(0); e.setVelocityY(0); });
+            this.users.forEach((e) => { e.setVelocityX(0); e.setVelocityY(0); });
         }
     }
 }
