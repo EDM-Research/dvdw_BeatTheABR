@@ -20,7 +20,7 @@ export class GameElement {
         let states: any = {
             'demo': 'Demo',
             'flappy': 'Flappy ABR',
-            'karaoke': 'ABR Karaoke',
+            'karaoke': 'Bit Rate Optimizer',
         };
 
         // setup controls
@@ -48,10 +48,10 @@ export class GameElement {
             parent: parent,
         });
 
-        this.engine.scene.add('karaoke', new KaraokeScene(this), true);
+        this.engine.scene.add('karaoke', new KaraokeScene(this));
         this.engine.scene.add('flappy', new FlappyScene(this));
-        this.engine.scene.add('demo', new DemoScene(this));
-        this.state = 'karaoke';
+        this.engine.scene.add('demo', new DemoScene(this), true);
+        this.state = 'demo';
     }
 
     public reset() {
@@ -483,6 +483,7 @@ class KaraokeScene extends Scene {
 
     current: number;
     timer: number;
+    bufferTime: number;
 
     started: boolean;
     firstStart: boolean;
@@ -495,10 +496,12 @@ class KaraokeScene extends Scene {
     static readonly PointerX = Width / 5;
 
     static readonly ErrorStart = Width;
-    static readonly ErrorBuffer = 200;
+    static readonly ErrorBuffer = 50;
     static readonly ErrorSpacer = 100;
 
     static readonly ErrorChance = 0.5;
+
+    static readonly BufferTime = 200;
 
     constructor(game: GameElement) {
         super();
@@ -510,6 +513,7 @@ class KaraokeScene extends Scene {
 
         this.current = 0;
         this.timer = FlappyScene.GameTime;
+        this.bufferTime = 0;
 
         this.started = false;
         this.firstStart = true;
@@ -521,6 +525,7 @@ class KaraokeScene extends Scene {
     public reset() {
         this.current = 0;
         this.timer = FlappyScene.GameTime;
+        this.bufferTime = 0;
 
         this.started = false;
         this.firstStart = true;
@@ -541,6 +546,7 @@ class KaraokeScene extends Scene {
 
     public preload() {
         this.load.image('play', './assets/play.png');
+        this.load.image('angry', './assets/angry.png');
 
         this.load.image('red50', './assets/red50.png');
     }
@@ -647,9 +653,15 @@ class KaraokeScene extends Scene {
                 this.ge.controls.enableScoreSubmit();
             }
 
+            this.bufferTime -= delta;
             if (this.physics.world.overlap(this.pointerPlay, this.errors)) {
-                // this.current = Math.min(this.ge.video.max -1, this.current+1); //TODO
+                this.bufferTime = Math.max(this.bufferTime, KaraokeScene.BufferTime * (this.ge.video.max - this.current));
+            }
+
+            if (this.bufferTime > 0) {
+                this.ge.video.change(this.ge.video.loading);
             } else {
+                this.ge.video.change(this.current);
                 this.ge.controls.score += delta * this.diffMod * (this.ge.video.max - this.current) / 1000;
             }
 
@@ -675,6 +687,14 @@ class KaraokeScene extends Scene {
                 cp.body.updateFromGameObject();
                 cp.setVelocityX(-100 * this.diffMod);
                 this.errors.push(cp);
+
+                if (index !== 2 && rnd.y > 0.5) {
+                    let us = this.physics.add.sprite(nx, this.lines[this.ge.video.max - 1].y1 - 50, 'angry');
+                    us.setOrigin(0, 0);
+                    us.body.updateFromGameObject();
+                    us.setVelocityX(-100 * this.diffMod);
+                    this.errors.push(us);
+                }
             }
 
             let oldest = this.errors[0];
