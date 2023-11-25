@@ -678,7 +678,7 @@ class KaraokeScene extends Scene {
                     if (this.physics.world.overlap(this.pointerPlay, u)) {
                         u.setVisible(false);
                         u.setY(Height * 2);
-                        this.ge.controls.score -= 50;
+                        this.ge.controls.score = Math.max(0, this.ge.controls.score - 50);
                         break;
                     } else {
                         //
