@@ -25,6 +25,7 @@ export class GameElement {
 
         // setup controls
         this.controls.resetBtn.onclick = () => { this.reset(); };
+        this.controls.reloadBtn.onclick = () => { window.location.reload(); };
         this.controls.setStates(states);
         this.controls.stateSelect.onchange = () => {
             let nstate = this.controls.stateSelect.selectedOptions[0].value;

@@ -42,6 +42,7 @@ async function HandleScoreboard(action: string, body: ReadableStream<Uint8Array>
             data[payload['game']].push({
                 "name": payload['name'],
                 "score": payload['score'],
+                "diff": payload['diff'],
             });
             Bun.write(scoreFile, JSON.stringify(data));
             break;

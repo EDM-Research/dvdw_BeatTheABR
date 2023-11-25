@@ -6,6 +6,7 @@ export class ControlsElement {
     stateSelect: HTMLSelectElement;
     difficultySelect: HTMLSelectElement;
     resetBtn: HTMLButtonElement;
+    reloadBtn: HTMLButtonElement;
     nameInput: HTMLInputElement;
     scoreSubmit: HTMLButtonElement;
 
@@ -37,6 +38,7 @@ export class ControlsElement {
                     'game': this.stateSelect.value,
                     'name': this.nameInput.value,
                     'score': Math.round(this.scoreValue),
+                    'diff': this.difficultySelect.value[0],
                 }),
             });
             this.nameInput.value = '';
@@ -62,6 +64,11 @@ export class ControlsElement {
         this.styleButton(this.resetBtn);
         this.resetBtn.innerText = 'Reset';
         parent.appendChild(this.resetBtn);
+
+        this.reloadBtn = document.createElement('button');
+        this.styleButton(this.reloadBtn);
+        this.reloadBtn.innerText = 'Reload Page';
+        parent.appendChild(this.reloadBtn);
     }
 
     public reset() {
