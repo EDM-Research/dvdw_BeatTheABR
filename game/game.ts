@@ -43,7 +43,7 @@ export class GameElement {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: false,
+                    debug: true,
                 }
             },
             parent: parent,
@@ -344,10 +344,10 @@ class FlappyScene extends Scene {
                         this.diffMod = 1;
                         break;
                     case 'Medium':
-                        this.diffMod = 2;
+                        this.diffMod = 1.5;
                         break;
                     case 'Hard':
-                        this.diffMod = 3;
+                        this.diffMod = 2;
                         break;
 
                     default:
@@ -377,13 +377,13 @@ class FlappyScene extends Scene {
             this.bufferTime -= delta;
             //@ts-ignore
             if (this.physics.world.collide(this.bird, this.ceiling) || this.physics.world.overlap(this.bird, this.ceilingPipes)) {
-                this.bufferTime = FlappyScene.BufferTime;
+                this.bufferTime = FlappyScene.BufferTime * this.diffMod;
             }
 
             this.lqTime -= delta;
             //@ts-ignore
             if (this.physics.world.collide(this.bird, this.ground) || this.physics.world.overlap(this.bird, this.groundPipes)) {
-                this.lqTime = FlappyScene.BufferTime;
+                this.lqTime = FlappyScene.BufferTime * this.diffMod;
             }
 
             if (this.bufferTime > 0) {
@@ -577,6 +577,7 @@ class KaraokeScene extends Scene {
         this.chances.push(1);
 
         this.pointerPlay = this.physics.add.sprite(100, 100, 'play');
+        this.pointerPlay.body?.setCircle(25, 0, 0);
 
         this.timerText = this.add.text(10, 20, 'Time Left: ', { fontSize: 30, color: Black.toString() });
 
@@ -636,10 +637,10 @@ class KaraokeScene extends Scene {
                         this.diffMod = 1;
                         break;
                     case 'Medium':
-                        this.diffMod = 2;
+                        this.diffMod = 1.5;
                         break;
                     case 'Hard':
-                        this.diffMod = 3;
+                        this.diffMod = 2;
                         break;
 
                     default:
@@ -661,7 +662,7 @@ class KaraokeScene extends Scene {
 
             this.bufferTime -= delta;
             if (this.physics.world.overlap(this.pointerPlay, this.errors)) {
-                this.bufferTime = Math.max(this.bufferTime, KaraokeScene.BufferTime * (this.ge.video.max - this.current));
+                this.bufferTime = Math.max(this.bufferTime, KaraokeScene.BufferTime * (this.ge.video.max - this.current) * this.diffMod);
             }
 
             if (this.bufferTime > 0) {
