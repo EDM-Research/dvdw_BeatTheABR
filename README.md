@@ -1,5 +1,7 @@
 # Beat The ABR
 
+![Main screen Image](screen.png)
+
 To install dependencies:
 
 ```bash
