@@ -43,7 +43,7 @@ export class GameElement {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: true,
+                    debug: false,
                 }
             },
             parent: parent,
